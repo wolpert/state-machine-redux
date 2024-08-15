@@ -2,6 +2,7 @@ package com.codeheadsystems.smr.impl;
 
 import com.codeheadsystems.smr.Action;
 import com.codeheadsystems.smr.CallbackContext;
+import com.codeheadsystems.smr.ImmutableCallbackContext;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.StateMachineException;
@@ -51,6 +52,8 @@ public class StateMachineImpl implements StateMachine {
 
   @Override
   public void tick() {
+    final State currentState = state.get();
+    dispatchCallbacks(currentState, CallbackContext.Event.TICK);
   }
 
   @Override
@@ -59,7 +62,9 @@ public class StateMachineImpl implements StateMachine {
     final Map<Action, State> actionStateMap = transitions.get(currentState);
     final State newState = actionStateMap.get(action);
     if (newState != null) {
+      dispatchCallbacks(currentState, CallbackContext.Event.EXIT);
       state.set(newState);
+      dispatchCallbacks(newState, CallbackContext.Event.ENTER);
       return newState;
     }
     return returnOrThrow(currentState,
@@ -78,6 +83,18 @@ public class StateMachineImpl implements StateMachine {
                               final CallbackContext.Event event,
                               final Consumer<CallbackContext> contextConsumer) {
     callbackMap.get(state)[event.ordinal()].remove(contextConsumer);
+  }
+
+  private void dispatchCallbacks(final State currentState,
+                                 final CallbackContext.Event event) {
+    final Set<Consumer<CallbackContext>>[] callbacks = callbackMap.get(currentState);
+    final CallbackContext context = ImmutableCallbackContext.builder()
+        .stateMachine(this)
+        .state(currentState)
+        .event(event)
+        .build();
+    // TODO: Do this safely
+    callbacks[event.ordinal()].forEach(consumer -> consumer.accept(context));
   }
 
   private <T> T returnOrThrow(final T t,
