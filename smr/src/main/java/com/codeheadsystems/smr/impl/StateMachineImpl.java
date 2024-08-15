@@ -110,4 +110,6 @@ public class StateMachineImpl implements StateMachine {
     return Arrays.stream(CallbackContext.Event.values())
         .map(event -> new HashSet<Consumer<CallbackContext>>()).toArray(Set[]::new);
   }
+
+
 }

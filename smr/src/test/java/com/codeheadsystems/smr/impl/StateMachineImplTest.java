@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.codeheadsystems.smr.Action;
+import com.codeheadsystems.smr.CallbackContext;
 import com.codeheadsystems.smr.ImmutableAction;
 import com.codeheadsystems.smr.ImmutableState;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.StateMachineException;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 class StateMachineImplTest {
@@ -70,6 +72,31 @@ class StateMachineImplTest {
     assertThat(stateMachine.state()).isEqualTo(ONE);
     assertThat(stateMachine.dispatch(TO_TWO)).isEqualTo(TWO);
     assertThat(stateMachine.state()).isEqualTo(TWO);
+  }
+
+  @Test
+  void ticks() {
+    StateMachine stateMachine = setUpStateMachine(false);
+    Capture capture = new Capture();
+    stateMachine.enableCallback(ONE, CallbackContext.Event.TICK, capture::capture);
+    stateMachine.tick();
+    stateMachine.tick();
+    assertThat(capture.contexts).hasSize(2);
+    assertThat(capture.contexts.get(0).stateMachine()).isEqualTo(stateMachine);
+    assertThat(capture.contexts.get(0).event()).isEqualTo(CallbackContext.Event.TICK);
+    assertThat(capture.contexts.get(0).state()).isEqualTo(ONE);
+    assertThat(capture.contexts.get(1).stateMachine()).isEqualTo(stateMachine);
+    assertThat(capture.contexts.get(1).event()).isEqualTo(CallbackContext.Event.TICK);
+    assertThat(capture.contexts.get(1).state()).isEqualTo(ONE);
+  }
+
+  static class Capture {
+
+    ArrayList<CallbackContext> contexts = new ArrayList<>();
+
+    public void capture(CallbackContext context) {
+      contexts.add(context);
+    }
   }
 
 }
