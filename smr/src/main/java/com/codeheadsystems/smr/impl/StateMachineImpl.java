@@ -1,22 +1,24 @@
 package com.codeheadsystems.smr.impl;
 
 import com.codeheadsystems.smr.Action;
-import com.codeheadsystems.smr.callback.Callback;
+import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.StateMachineException;
+import com.codeheadsystems.smr.callback.Callback;
 import com.codeheadsystems.smr.callback.Event;
 import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StateMachineImpl implements StateMachine {
+public class StateMachineImpl implements StateMachine, Context {
 
   private final AtomicReference<State> state;
   private final Map<State, Map<Action, State>> transitions;
@@ -34,6 +36,14 @@ public class StateMachineImpl implements StateMachine {
   @Override
   public State state() {
     return state.get();
+  }
+
+  @Override
+  public State setState(final State state) {
+    Objects.requireNonNull(state);
+    final State oldState = this.state.get();
+    this.state.set(state);
+    return oldState;
   }
 
   @Override
@@ -64,7 +74,7 @@ public class StateMachineImpl implements StateMachine {
     final State newState = actionStateMap.get(action);
     if (newState != null) {
       dispatchCallbacks(currentState, Event.EXIT);
-      state.set(newState);
+      setState(newState);
       dispatchCallbacks(newState, Event.ENTER);
       return newState;
     }
@@ -111,6 +121,5 @@ public class StateMachineImpl implements StateMachine {
     return Arrays.stream(Event.values())
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
-
 
 }
