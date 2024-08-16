@@ -1,5 +1,7 @@
 package com.codeheadsystems.smr;
 
+import com.codeheadsystems.smr.callback.Callback;
+import com.codeheadsystems.smr.callback.Event;
 import com.codeheadsystems.smr.impl.StateMachineBuilder;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -43,9 +45,9 @@ public interface StateMachine {
    */
   Set<Action> actions(State state);
 
-  void enableCallback(State state, CallbackContext.Event event, Consumer<CallbackContext> contextConsumer);
+  void enable(State state, Event event, Consumer<Callback> contextConsumer);
 
-  void disableCallback(State state, CallbackContext.Event event, Consumer<CallbackContext> contextConsumer);
+  void disable(State state, Event event, Consumer<Callback> contextConsumer);
 
   /**
    * Dispatch an action to the state machine.

@@ -43,11 +43,11 @@ in the code.
        .addTransition(IDLE, ACTION_BUTTON, RUN)
        .build();
 
-    sm.enableCallback(IDLE, CallbackContext.Event.TICK, (c)->idleModeDisplay());
-    sm.enableCallback(RUN, CallbackContext.Event.TICK, (c)->runModeDisplay());
-    sm.enableCallback(RUN, CallbackContext.Event.TICK, (c)->runModeDisplay());
-    sm.enableCallback(JUMP, CallbackContext.Event.ENTER, (c)->startAnimation("jump"));
-    sm.enableCallback(RUN, CallbackContext.Event.ENTER, (c)->startAnimation("run"));
+    sm.enable(IDLE, Event.TICK, (c)->idleModeDisplay());
+    sm.enable(RUN, Event.TICK, (c)->runModeDisplay());
+    sm.enable(RUN, Event.TICK, (c)->runModeDisplay());
+    sm.enable(JUMP, Event.ENTER, (c)->startAnimation("jump"));
+    sm.enable(RUN, Event.ENTER, (c)->startAnimation("run"));
 ```
 
 An example where the context for the state that is changing is external to the

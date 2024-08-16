@@ -1,11 +1,12 @@
 package com.codeheadsystems.smr.impl;
 
 import com.codeheadsystems.smr.Action;
-import com.codeheadsystems.smr.CallbackContext;
-import com.codeheadsystems.smr.ImmutableCallbackContext;
+import com.codeheadsystems.smr.callback.Callback;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.StateMachineException;
+import com.codeheadsystems.smr.callback.Event;
+import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ public class StateMachineImpl implements StateMachine {
 
   private final AtomicReference<State> state;
   private final Map<State, Map<Action, State>> transitions;
-  private final Map<State, Set<Consumer<CallbackContext>>[]> callbackMap;
+  private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
   StateMachineImpl(final StateMachineBuilder builder) {
@@ -53,7 +54,7 @@ public class StateMachineImpl implements StateMachine {
   @Override
   public void tick() {
     final State currentState = state.get();
-    dispatchCallbacks(currentState, CallbackContext.Event.TICK);
+    dispatchCallbacks(currentState, Event.TICK);
   }
 
   @Override
@@ -62,9 +63,9 @@ public class StateMachineImpl implements StateMachine {
     final Map<Action, State> actionStateMap = transitions.get(currentState);
     final State newState = actionStateMap.get(action);
     if (newState != null) {
-      dispatchCallbacks(currentState, CallbackContext.Event.EXIT);
+      dispatchCallbacks(currentState, Event.EXIT);
       state.set(newState);
-      dispatchCallbacks(newState, CallbackContext.Event.ENTER);
+      dispatchCallbacks(newState, Event.ENTER);
       return newState;
     }
     return returnOrThrow(currentState,
@@ -72,23 +73,23 @@ public class StateMachineImpl implements StateMachine {
   }
 
   @Override
-  public void enableCallback(final State state,
-                             final CallbackContext.Event event,
-                             final Consumer<CallbackContext> contextConsumer) {
+  public void enable(final State state,
+                     final Event event,
+                     final Consumer<Callback> contextConsumer) {
     callbackMap.get(state)[event.ordinal()].add(contextConsumer);
   }
 
   @Override
-  public void disableCallback(final State state,
-                              final CallbackContext.Event event,
-                              final Consumer<CallbackContext> contextConsumer) {
+  public void disable(final State state,
+                      final Event event,
+                      final Consumer<Callback> contextConsumer) {
     callbackMap.get(state)[event.ordinal()].remove(contextConsumer);
   }
 
   private void dispatchCallbacks(final State currentState,
-                                 final CallbackContext.Event event) {
-    final Set<Consumer<CallbackContext>>[] callbacks = callbackMap.get(currentState);
-    final CallbackContext context = ImmutableCallbackContext.builder()
+                                 final Event event) {
+    final Set<Consumer<Callback>>[] callbacks = callbackMap.get(currentState);
+    final Callback context = ImmutableCallback.builder()
         .stateMachine(this)
         .state(currentState)
         .event(event)
@@ -106,9 +107,9 @@ public class StateMachineImpl implements StateMachine {
   }
 
   @SuppressWarnings("unchecked")
-  private Set<Consumer<CallbackContext>>[] buildList() {
-    return Arrays.stream(CallbackContext.Event.values())
-        .map(event -> new HashSet<Consumer<CallbackContext>>()).toArray(Set[]::new);
+  private Set<Consumer<Callback>>[] buildList() {
+    return Arrays.stream(Event.values())
+        .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
 
 

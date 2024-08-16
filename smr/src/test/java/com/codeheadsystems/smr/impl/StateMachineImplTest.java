@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.codeheadsystems.smr.Action;
-import com.codeheadsystems.smr.CallbackContext;
 import com.codeheadsystems.smr.ImmutableAction;
-import com.codeheadsystems.smr.ImmutableCallbackContext;
 import com.codeheadsystems.smr.ImmutableState;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.StateMachineException;
+import com.codeheadsystems.smr.callback.Callback;
+import com.codeheadsystems.smr.callback.Event;
+import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,16 @@ class StateMachineImplTest {
   private static final Action TO_TWO = ImmutableAction.of("ToTwo");
   private static final Action TO_THREE = ImmutableAction.of("ToThree");
   private static final Action TO_ONE = ImmutableAction.of("ToOne");
+
+  private static Callback getContext(final StateMachine stateMachine,
+                                     final State state,
+                                     final Event event) {
+    return ImmutableCallback.builder()
+        .stateMachine(stateMachine)
+        .state(state)
+        .event(event)
+        .build();
+  }
 
   StateMachine setUpStateMachine(boolean withException) {
     return StateMachine.builder()
@@ -79,53 +90,42 @@ class StateMachineImplTest {
   void transition_withCallbacks() {
     StateMachine stateMachine = setUpStateMachine(false);
     Capture capture = new Capture();
-    stateMachine.enableCallback(ONE, CallbackContext.Event.ENTER, capture::capture);
-    stateMachine.enableCallback(ONE, CallbackContext.Event.EXIT, capture::capture);
-    stateMachine.enableCallback(TWO, CallbackContext.Event.ENTER, capture::capture);
-    stateMachine.enableCallback(TWO, CallbackContext.Event.EXIT, capture::capture);
+    stateMachine.enable(ONE, Event.ENTER, capture::capture);
+    stateMachine.enable(ONE, Event.EXIT, capture::capture);
+    stateMachine.enable(TWO, Event.ENTER, capture::capture);
+    stateMachine.enable(TWO, Event.EXIT, capture::capture);
     stateMachine.dispatch(TO_TWO);
     stateMachine.dispatch(TO_THREE);
     stateMachine.dispatch(TO_TWO);
     stateMachine.dispatch(TO_ONE);
     assertThat(capture.contexts).hasSize(6);
     assertThat(capture.contexts).containsExactly(
-        getContext(stateMachine, ONE, CallbackContext.Event.EXIT),
-        getContext(stateMachine, TWO, CallbackContext.Event.ENTER),
-        getContext(stateMachine, TWO, CallbackContext.Event.EXIT),
-        getContext(stateMachine, TWO, CallbackContext.Event.ENTER),
-        getContext(stateMachine, TWO, CallbackContext.Event.EXIT),
-        getContext(stateMachine, ONE, CallbackContext.Event.ENTER)
+        getContext(stateMachine, ONE, Event.EXIT),
+        getContext(stateMachine, TWO, Event.ENTER),
+        getContext(stateMachine, TWO, Event.EXIT),
+        getContext(stateMachine, TWO, Event.ENTER),
+        getContext(stateMachine, TWO, Event.EXIT),
+        getContext(stateMachine, ONE, Event.ENTER)
     );
   }
 
   @Test
   void ticks() {
     StateMachine stateMachine = setUpStateMachine(false);
-    CallbackContext expected = getContext(stateMachine, ONE, CallbackContext.Event.TICK);
+    Callback expected = getContext(stateMachine, ONE, Event.TICK);
     Capture capture = new Capture();
-    stateMachine.enableCallback(ONE, CallbackContext.Event.TICK, capture::capture);
+    stateMachine.enable(ONE, Event.TICK, capture::capture);
     stateMachine.tick();
     stateMachine.tick();
     assertThat(capture.contexts).hasSize(2);
     assertThat(capture.contexts).containsExactly(expected, expected);
   }
 
-
-  private static ImmutableCallbackContext getContext(final StateMachine stateMachine,
-                                                     final State state,
-                                                     final CallbackContext.Event event) {
-    return ImmutableCallbackContext.builder()
-        .stateMachine(stateMachine)
-        .state(state)
-        .event(event)
-        .build();
-  }
-
   static class Capture {
 
-    ArrayList<CallbackContext> contexts = new ArrayList<>();
+    ArrayList<Callback> contexts = new ArrayList<>();
 
-    public void capture(CallbackContext context) {
+    public void capture(Callback context) {
       contexts.add(context);
     }
   }
