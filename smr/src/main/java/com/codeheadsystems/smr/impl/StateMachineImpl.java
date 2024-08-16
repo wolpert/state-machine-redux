@@ -34,16 +34,13 @@ public class StateMachineImpl implements StateMachine, Context {
   }
 
   @Override
-  public State state() {
-    return state.get();
+  public AtomicReference<State> reference() {
+    return state;
   }
 
   @Override
-  public State setState(final State state) {
-    Objects.requireNonNull(state);
-    final State oldState = this.state.get();
-    this.state.set(state);
-    return oldState;
+  public State state() {
+    return state.get();
   }
 
   @Override
@@ -74,7 +71,7 @@ public class StateMachineImpl implements StateMachine, Context {
     final State newState = actionStateMap.get(action);
     if (newState != null) {
       dispatchCallbacks(currentState, Event.EXIT);
-      setState(newState);
+      state.set(newState);
       dispatchCallbacks(newState, Event.ENTER);
       return newState;
     }
