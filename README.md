@@ -25,3 +25,30 @@ to model one state machine with many concurrent contexts.
 
 The mistake with the original implementation was that this complex pattern
 was built first, making it impossible to understand the simple use-case.
+
+## Example
+
+Simple example where we focus on a single state machine and the context is defined
+in the code.
+
+```java
+  // Setup State machine
+   StateMachine sm = StateMachine.builder()
+       .addState(IDLE).addState(RUN).addState(JUMP)
+       .setInitialState(IDLE)
+       .addTransition(IDLE, SPACEBAR, JUMP)
+       .addTransition(RUN, SPACEBAR, JUMP)
+       .addTransition(JUMP, END_ACTION, IDLE)
+       .addTransition(RUN, END_ACTION, IDLE)
+       .addTransition(IDLE, ACTION_BUTTON, RUN)
+       .build();
+
+    sm.enableCallback(IDLE, CallbackContext.Event.TICK, (c)->idleModeDisplay());
+    sm.enableCallback(RUN, CallbackContext.Event.TICK, (c)->runModeDisplay());
+    sm.enableCallback(RUN, CallbackContext.Event.TICK, (c)->runModeDisplay());
+    sm.enableCallback(JUMP, CallbackContext.Event.ENTER, (c)->startAnimation("jump"));
+    sm.enableCallback(RUN, CallbackContext.Event.ENTER, (c)->startAnimation("run"));
+```
+
+An example where the context for the state that is changing is external to the
+state machine:

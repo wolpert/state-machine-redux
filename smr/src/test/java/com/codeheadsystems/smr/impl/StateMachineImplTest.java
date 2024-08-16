@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.codeheadsystems.smr.Action;
 import com.codeheadsystems.smr.CallbackContext;
 import com.codeheadsystems.smr.ImmutableAction;
+import com.codeheadsystems.smr.ImmutableCallbackContext;
 import com.codeheadsystems.smr.ImmutableState;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
@@ -75,19 +76,49 @@ class StateMachineImplTest {
   }
 
   @Test
+  void transition_withCallbacks() {
+    StateMachine stateMachine = setUpStateMachine(false);
+    Capture capture = new Capture();
+    stateMachine.enableCallback(ONE, CallbackContext.Event.ENTER, capture::capture);
+    stateMachine.enableCallback(ONE, CallbackContext.Event.EXIT, capture::capture);
+    stateMachine.enableCallback(TWO, CallbackContext.Event.ENTER, capture::capture);
+    stateMachine.enableCallback(TWO, CallbackContext.Event.EXIT, capture::capture);
+    stateMachine.dispatch(TO_TWO);
+    stateMachine.dispatch(TO_THREE);
+    stateMachine.dispatch(TO_TWO);
+    stateMachine.dispatch(TO_ONE);
+    assertThat(capture.contexts).hasSize(6);
+    assertThat(capture.contexts).containsExactly(
+        getContext(stateMachine, ONE, CallbackContext.Event.EXIT),
+        getContext(stateMachine, TWO, CallbackContext.Event.ENTER),
+        getContext(stateMachine, TWO, CallbackContext.Event.EXIT),
+        getContext(stateMachine, TWO, CallbackContext.Event.ENTER),
+        getContext(stateMachine, TWO, CallbackContext.Event.EXIT),
+        getContext(stateMachine, ONE, CallbackContext.Event.ENTER)
+    );
+  }
+
+  @Test
   void ticks() {
     StateMachine stateMachine = setUpStateMachine(false);
+    CallbackContext expected = getContext(stateMachine, ONE, CallbackContext.Event.TICK);
     Capture capture = new Capture();
     stateMachine.enableCallback(ONE, CallbackContext.Event.TICK, capture::capture);
     stateMachine.tick();
     stateMachine.tick();
     assertThat(capture.contexts).hasSize(2);
-    assertThat(capture.contexts.get(0).stateMachine()).isEqualTo(stateMachine);
-    assertThat(capture.contexts.get(0).event()).isEqualTo(CallbackContext.Event.TICK);
-    assertThat(capture.contexts.get(0).state()).isEqualTo(ONE);
-    assertThat(capture.contexts.get(1).stateMachine()).isEqualTo(stateMachine);
-    assertThat(capture.contexts.get(1).event()).isEqualTo(CallbackContext.Event.TICK);
-    assertThat(capture.contexts.get(1).state()).isEqualTo(ONE);
+    assertThat(capture.contexts).containsExactly(expected, expected);
+  }
+
+
+  private static ImmutableCallbackContext getContext(final StateMachine stateMachine,
+                                                     final State state,
+                                                     final CallbackContext.Event event) {
+    return ImmutableCallbackContext.builder()
+        .stateMachine(stateMachine)
+        .state(state)
+        .event(event)
+        .build();
   }
 
   static class Capture {
