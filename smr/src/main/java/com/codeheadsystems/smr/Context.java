@@ -11,10 +11,6 @@ public interface Context {
 
   AtomicReference<State> reference();
 
-  default State state() {
-    return reference().get();
-  }
-
   /**
    * You can extend this to generate your own context easily enough.
    */

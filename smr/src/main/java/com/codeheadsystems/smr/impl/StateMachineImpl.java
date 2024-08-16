@@ -12,21 +12,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StateMachineImpl implements StateMachine, Context {
+public class StateMachineImpl extends Context.Impl implements StateMachine {
 
-  private final AtomicReference<State> state;
   private final Map<State, Map<Action, State>> transitions;
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
   StateMachineImpl(final StateMachineBuilder builder) {
-    this.state = new AtomicReference<>(builder.initialState);
+    super(builder.initialState);
     this.transitions = builder.transitions;
     this.useExceptions = builder.useExceptions;
     this.callbackMap = states().stream()
@@ -34,13 +31,8 @@ public class StateMachineImpl implements StateMachine, Context {
   }
 
   @Override
-  public AtomicReference<State> reference() {
-    return state;
-  }
-
-  @Override
   public State state() {
-    return state.get();
+    return reference().get();
   }
 
   @Override
@@ -50,7 +42,7 @@ public class StateMachineImpl implements StateMachine, Context {
 
   @Override
   public Set<Action> actions() {
-    return actions(state.get());
+    return actions(state());
   }
 
   @Override
@@ -60,18 +52,18 @@ public class StateMachineImpl implements StateMachine, Context {
 
   @Override
   public void tick() {
-    final State currentState = state.get();
+    final State currentState = state();
     dispatchCallbacks(currentState, Event.TICK);
   }
 
   @Override
   public State dispatch(final Action action) {
-    final State currentState = state.get();
+    final State currentState = state();
     final Map<Action, State> actionStateMap = transitions.get(currentState);
     final State newState = actionStateMap.get(action);
     if (newState != null) {
       dispatchCallbacks(currentState, Event.EXIT);
-      state.set(newState);
+      reference().set(newState);
       dispatchCallbacks(newState, Event.ENTER);
       return newState;
     }
