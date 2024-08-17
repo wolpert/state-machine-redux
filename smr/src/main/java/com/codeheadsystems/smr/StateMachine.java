@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * State machines are immutable once built regarding the states and available
  * transitions.
  */
-public interface StateMachine {
+public interface StateMachine extends Context{
 
   static StateMachineBuilder builder() {
     return new StateMachineBuilder();

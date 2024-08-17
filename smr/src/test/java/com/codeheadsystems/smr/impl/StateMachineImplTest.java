@@ -28,7 +28,7 @@ class StateMachineImplTest {
                                      final State state,
                                      final Event event) {
     return ImmutableCallback.builder()
-        .stateMachine(stateMachine)
+        .context(stateMachine)
         .state(state)
         .event(event)
         .build();
