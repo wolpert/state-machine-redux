@@ -10,6 +10,7 @@ import com.codeheadsystems.smr.callback.Phase;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -47,21 +48,32 @@ public class StateMachineDefinition {
     return transitions.get(state).keySet();
   }
 
+  public boolean hasState(final State state) {
+    return transitions.containsKey(state);
+  }
+
+  public Optional<State> forEvent(final State state,
+                                  final Event event) {
+    if (hasState(state)) {
+      return Optional.ofNullable(transitions.get(state).get(event));
+    } else {
+      return Optional.empty();
+    }
+  }
+
   public void tick(final Context context) {
     final State currentState = context.reference().get();
-    if (!transitions.containsKey(currentState)) {
-      returnOrThrow(false, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
-    } else {
+    if (hasState(currentState)) {
       dispatcher.dispatchCallbacks(context, currentState, Phase.TICK);
+    } else {
+      returnOrThrow(false, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
     }
   }
 
   public State dispatch(final Context context,
                         final Event event) {
     final State currentState = context.reference().get();
-    if (!transitions.containsKey(currentState)) {
-      return returnOrThrow(currentState, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
-    } else {
+    if (hasState(currentState)) {
       final Map<Event, State> eventStateMap = transitions.get(currentState);
       final State newState = eventStateMap.get(event);
       if (newState != null) {
@@ -71,26 +83,28 @@ public class StateMachineDefinition {
         return returnOrThrow(currentState,
             () -> new StateMachineException("No transition for event " + event + " from state " + currentState));
       }
+    } else {
+      return returnOrThrow(currentState, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
     }
   }
 
   public void enable(final State state,
                      final Phase phase,
                      final Consumer<Callback> contextConsumer) {
-    if (transitions.get(state) == null) {
-      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
-    } else {
+    if (hasState(state)) {
       dispatcher.enable(state, phase, contextConsumer);
+    } else {
+      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     }
   }
 
   public void disable(final State state,
                       final Phase phase,
                       final Consumer<Callback> contextConsumer) {
-    if (transitions.get(state) == null) {
-      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
-    } else {
+    if (hasState(state)) {
       dispatcher.disable(state, phase, contextConsumer);
+    } else {
+      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     }
   }
 

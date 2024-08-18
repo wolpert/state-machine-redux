@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.callback.ImmutableCallback;
+import com.codeheadsystems.smr.callback.Phase;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
@@ -78,6 +78,15 @@ class StateMachineTest {
     assertThat(stateMachine.state()).isEqualTo(ONE);
     assertThat(stateMachine.dispatch(TO_TWO)).isEqualTo(TWO);
     assertThat(stateMachine.state()).isEqualTo(TWO);
+  }
+
+  @Test
+  void transitionsFailsToUnknownEvent() {
+    StateMachine stateMachine = setUpStateMachine(true);
+    assertThat(stateMachine.state()).isEqualTo(ONE);
+    assertThatExceptionOfType(StateMachineException.class)
+        .isThrownBy(() -> stateMachine.dispatch(ImmutableEvent.of("unknown")));
+    assertThat(stateMachine.state()).isEqualTo(ONE);
   }
 
   @Test
