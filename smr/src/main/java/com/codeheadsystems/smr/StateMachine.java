@@ -2,7 +2,7 @@ package com.codeheadsystems.smr;
 
 import com.codeheadsystems.smr.callback.Callback;
 import com.codeheadsystems.smr.callback.Event;
-import com.codeheadsystems.smr.impl.StateMachineBuilder;
+import com.codeheadsystems.smr.impl.StateMachineImpl;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -10,10 +10,10 @@ import java.util.function.Consumer;
  * State machines are immutable once built regarding the states and available
  * transitions.
  */
-public interface StateMachine extends Context{
+public interface StateMachine extends Context {
 
-  static StateMachineBuilder builder() {
-    return new StateMachineBuilder();
+  static StateMachineImpl.Builder builder() {
+    return new StateMachineImpl.Builder();
   }
 
   /**

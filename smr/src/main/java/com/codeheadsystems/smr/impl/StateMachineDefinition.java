@@ -15,17 +15,30 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StateMachineRuntime {
+public class StateMachineDefinition {
 
   private final Map<State, Map<Action, State>> transitions;
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
+  private final State initialState;
 
-  StateMachineRuntime(final StateMachineBuilder builder) {
+  <T> StateMachineDefinition(final StateMachineDefinitionBuilder<T> builder) {
+    if (builder.initialState == null) {
+      throw new StateMachineException("Initial state is required.");
+    }
     this.transitions = builder.transitions;
+    this.initialState = builder.initialState;
     this.useExceptions = builder.useExceptions;
     this.callbackMap = states().stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
+  }
+
+  public static StateMachineDefinition.Builder builder() {
+    return new StateMachineDefinition.Builder();
+  }
+
+  public State initialState() {
+    return initialState;
   }
 
   public Set<State> states() {
@@ -110,6 +123,15 @@ public class StateMachineRuntime {
   private Set<Consumer<Callback>>[] buildList() {
     return Arrays.stream(Event.values())
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
+  }
+
+  public static class Builder extends StateMachineDefinitionBuilder<StateMachineDefinition> {
+
+    @Override
+    public StateMachineDefinition build() {
+      return new StateMachineDefinition(this);
+    }
+
   }
 
 }

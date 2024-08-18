@@ -11,16 +11,16 @@ public interface Context {
 
   AtomicReference<State> reference();
 
+  default State state() {
+    return reference().get();
+  }
+
   /**
    * You can extend this to generate your own context easily enough.
    */
   abstract class Impl implements Context {
 
-    private final AtomicReference<State> state;
-
-    public Impl(StateMachine stateMachine) {
-      this(stateMachine.state());
-    }
+    protected final AtomicReference<State> state;
 
     public Impl(State initialState) {
       this.state = new AtomicReference<>(initialState);
@@ -30,6 +30,7 @@ public interface Context {
     public AtomicReference<State> reference() {
       return state;
     }
+
   }
 
 }

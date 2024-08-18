@@ -11,21 +11,21 @@ import java.util.function.Consumer;
 
 public class StateMachineImpl extends Context.Impl implements StateMachine {
 
-  private final StateMachineRuntime runtime;
+  private final StateMachineDefinition definition;
 
-  StateMachineImpl(final StateMachineBuilder builder) {
-    super(builder.initialState);
-    runtime = new StateMachineRuntime(builder);
+  StateMachineImpl(final StateMachineDefinition definition) {
+    super(definition.initialState());
+    this.definition = definition;
   }
 
   @Override
   public State state() {
-    return reference().get();
+    return state.get();
   }
 
   @Override
   public Set<State> states() {
-    return runtime.states();
+    return definition.states();
   }
 
   @Override
@@ -35,31 +35,40 @@ public class StateMachineImpl extends Context.Impl implements StateMachine {
 
   @Override
   public Set<Action> actions(final State state) {
-    return runtime.actions(state);
+    return definition.actions(state);
   }
 
   @Override
   public void tick() {
-    runtime.tick(this);
+    definition.tick(this);
   }
 
   @Override
   public State dispatch(final Action action) {
-    return runtime.dispatch(this, action);
+    return definition.dispatch(this, action);
   }
 
   @Override
   public void enable(final State state,
                      final Event event,
                      final Consumer<Callback> contextConsumer) {
-    runtime.enable(state, event, contextConsumer);
+    definition.enable(state, event, contextConsumer);
   }
 
   @Override
   public void disable(final State state,
                       final Event event,
                       final Consumer<Callback> contextConsumer) {
-    runtime.disable(state, event, contextConsumer);
+    definition.disable(state, event, contextConsumer);
   }
 
+
+  public static class Builder extends StateMachineDefinitionBuilder<StateMachine> {
+
+    @Override
+    public StateMachine build() {
+      return new StateMachineImpl(new StateMachineDefinition(this));
+    }
+
+  }
 }
