@@ -1,12 +1,12 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.Context;
+import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachineException;
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.callback.ImmutableCallback;
+import com.codeheadsystems.smr.callback.Phase;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,9 +67,7 @@ public class StateMachineDefinition {
       final Map<Event, State> eventStateMap = transitions.get(currentState);
       final State newState = eventStateMap.get(event);
       if (newState != null) {
-        dispatchCallbacks(context, currentState, Phase.EXIT);
-        context.reference().set(newState);
-        dispatchCallbacks(context, newState, Phase.ENTER);
+        handleTransitionEvent(context, currentState, newState);
         return newState;
       } else {
         return returnOrThrow(currentState,
@@ -96,6 +94,20 @@ public class StateMachineDefinition {
     } else {
       callbackMap.get(state)[phase.ordinal()].remove(contextConsumer);
     }
+  }
+
+  /**
+   * TODO: This method needs to be handled with care. Need to consider if we want to 1) back out of events if
+   * things failed, 2) keep it simple but incomplete, 3) allow for various implementations. (Most likely).
+   *
+   * @param context      that has state being changed.
+   * @param currentState the from state.
+   * @param newState     the too state.
+   */
+  private void handleTransitionEvent(final Context context, final State currentState, final State newState) {
+    dispatchCallbacks(context, currentState, Phase.EXIT);
+    context.reference().set(newState); // TODO: Gate this and validate old context is what we have.
+    dispatchCallbacks(context, newState, Phase.ENTER);
   }
 
   private void dispatchCallbacks(final Context context,
