@@ -1,35 +1,23 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Context;
-import com.codeheadsystems.smr.Dispatcher;
 import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachineException;
-import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Phase;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class StateMachineDefinition {
 
   private final Map<State, Map<Event, State>> transitions;
-  private final Dispatcher dispatcher;
-  private final boolean useExceptions;
   private final State initialState;
 
-  <T> StateMachineDefinition(final StateMachineDefinitionBuilder<T> builder) {
+  StateMachineDefinition(final StateMachineDefinitionBuilder<?> builder) {
     if (builder.initialState == null) {
       throw new StateMachineException("Initial state is required.");
     }
     this.transitions = builder.transitions;
     this.initialState = builder.initialState;
-    this.useExceptions = builder.useExceptions;
-    this.dispatcher = new DispatcherImpl(builder);
   }
 
   public static StateMachineDefinition.Builder builder() {
@@ -59,67 +47,6 @@ public class StateMachineDefinition {
     } else {
       return Optional.empty();
     }
-  }
-
-  public void tick(final Context context) {
-    final State currentState = context.reference().get();
-    if (hasState(currentState)) {
-      dispatcher.dispatchCallbacks(context, currentState, Phase.TICK);
-    } else {
-      returnOrThrow(false, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
-    }
-  }
-
-  public State dispatch(final Context context,
-                        final Event event) {
-    final State currentState = context.reference().get();
-    if (hasState(currentState)) {
-      final Map<Event, State> eventStateMap = transitions.get(currentState);
-      final State newState = eventStateMap.get(event);
-      if (newState != null) {
-        dispatcher.handleTransitionEvent(context, currentState, newState);
-        return newState;
-      } else {
-        return returnOrThrow(currentState,
-            () -> new StateMachineException("No transition for event " + event + " from state " + currentState));
-      }
-    } else {
-      return returnOrThrow(currentState, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
-    }
-  }
-
-  public void enable(final State state,
-                     final Phase phase,
-                     final Consumer<Callback> contextConsumer) {
-    if (hasState(state)) {
-      dispatcher.enable(state, phase, contextConsumer);
-    } else {
-      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
-    }
-  }
-
-  public void disable(final State state,
-                      final Phase phase,
-                      final Consumer<Callback> contextConsumer) {
-    if (hasState(state)) {
-      dispatcher.disable(state, phase, contextConsumer);
-    } else {
-      returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
-    }
-  }
-
-  private <T> T returnOrThrow(final T t,
-                              final Supplier<StateMachineException> supplier) {
-    if (useExceptions) {
-      throw supplier.get();
-    }
-    return t;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Set<Consumer<Callback>>[] buildList() {
-    return Arrays.stream(Phase.values())
-        .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
 
   public static class Builder extends StateMachineDefinitionBuilder<StateMachineDefinition> {

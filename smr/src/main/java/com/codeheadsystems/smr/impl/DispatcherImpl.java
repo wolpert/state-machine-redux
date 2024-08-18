@@ -17,7 +17,7 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
-  <T> DispatcherImpl(final StateMachineDefinitionBuilder<T> builder) {
+  DispatcherImpl(final StateMachineDefinitionBuilder<?> builder) {
     this.useExceptions = builder.useExceptions;
     this.callbackMap = builder.states.stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
