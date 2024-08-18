@@ -1,6 +1,6 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Action;
+import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.ImmutableState;
 import com.codeheadsystems.smr.State;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 public abstract class StateMachineDefinitionBuilder<T> {
 
   final Set<State> states;
-  final Map<State, Map<Action, State>> transitions;
+  final Map<State, Map<Event, State>> transitions;
   State initialState;
   boolean useExceptions;
 
@@ -37,14 +37,14 @@ public abstract class StateMachineDefinitionBuilder<T> {
     return this;
   }
 
-  public StateMachineDefinitionBuilder<T> addTransition(final State from, final Action action, final State to) {
+  public StateMachineDefinitionBuilder<T> addTransition(final State from, final Event event, final State to) {
     if (!states.contains(from)) {
       throw new IllegalArgumentException("State " + from + " is not in the state machine.");
     }
     if (!states.contains(to)) {
       throw new IllegalArgumentException("State " + to + " is not in the state machine.");
     }
-    transitions.get(from).put(action, to);
+    transitions.get(from).put(event, to);
     return this;
   }
 

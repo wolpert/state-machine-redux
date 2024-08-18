@@ -1,7 +1,7 @@
 package com.codeheadsystems.smr;
 
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Event;
+import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.impl.StateMachineImpl;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -31,31 +31,31 @@ public interface StateMachine extends Context {
   Set<State> states();
 
   /**
-   * Get the actions that are valid for the current state.
+   * Get the events that are valid for the current state.
    *
-   * @return set of actions
+   * @return set of events
    */
-  Set<Action> actions();
+  Set<Event> events();
 
   /**
-   * Get the actions that are valid for the given state.
+   * Get the events that are valid for the given state.
    *
    * @param state to check.
-   * @return set of actions.
+   * @return set of event.
    */
-  Set<Action> actions(State state);
+  Set<Event> events(State state);
 
-  void enable(State state, Event event, Consumer<Callback> contextConsumer);
+  void enable(State state, Phase phase, Consumer<Callback> contextConsumer);
 
-  void disable(State state, Event event, Consumer<Callback> contextConsumer);
+  void disable(State state, Phase phase, Consumer<Callback> contextConsumer);
 
   /**
-   * Dispatch an action to the state machine.
+   * Dispatch an event to the state machine.
    *
-   * @param action to dispatch.
+   * @param event to dispatch.
    * @return the new state if changed. Else the current state.
    */
-  State dispatch(Action action);
+  State dispatch(Event event);
 
   /**
    * Tick the state machine. Basically causes the callbacks on the current

@@ -1,11 +1,11 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Action;
+import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachine;
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Event;
+import com.codeheadsystems.smr.callback.Phase;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -29,13 +29,13 @@ public class StateMachineImpl extends Context.Impl implements StateMachine {
   }
 
   @Override
-  public Set<Action> actions() {
-    return actions(state());
+  public Set<Event> events() {
+    return events(state());
   }
 
   @Override
-  public Set<Action> actions(final State state) {
-    return definition.actions(state);
+  public Set<Event> events(final State state) {
+    return definition.events(state);
   }
 
   @Override
@@ -44,22 +44,22 @@ public class StateMachineImpl extends Context.Impl implements StateMachine {
   }
 
   @Override
-  public State dispatch(final Action action) {
-    return definition.dispatch(this, action);
+  public State dispatch(final Event event) {
+    return definition.dispatch(this, event);
   }
 
   @Override
   public void enable(final State state,
-                     final Event event,
+                     final Phase phase,
                      final Consumer<Callback> contextConsumer) {
-    definition.enable(state, event, contextConsumer);
+    definition.enable(state, phase, contextConsumer);
   }
 
   @Override
   public void disable(final State state,
-                      final Event event,
+                      final Phase phase,
                       final Consumer<Callback> contextConsumer) {
-    definition.disable(state, event, contextConsumer);
+    definition.disable(state, phase, contextConsumer);
   }
 
 

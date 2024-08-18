@@ -1,11 +1,11 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Action;
+import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachineException;
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Event;
+import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 public class StateMachineDefinition {
 
-  private final Map<State, Map<Action, State>> transitions;
+  private final Map<State, Map<Event, State>> transitions;
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
   private final State initialState;
@@ -45,7 +45,7 @@ public class StateMachineDefinition {
     return transitions.keySet();
   }
 
-  public Set<Action> actions(final State state) {
+  public Set<Event> events(final State state) {
     return transitions.get(state).keySet();
   }
 
@@ -54,61 +54,61 @@ public class StateMachineDefinition {
     if (!transitions.containsKey(currentState)) {
       returnOrThrow(false, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
     } else {
-      dispatchCallbacks(context, currentState, Event.TICK);
+      dispatchCallbacks(context, currentState, Phase.TICK);
     }
   }
 
   public State dispatch(final Context context,
-                        final Action action) {
+                        final Event event) {
     final State currentState = context.reference().get();
     if (!transitions.containsKey(currentState)) {
       return returnOrThrow(currentState, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
     } else {
-      final Map<Action, State> actionStateMap = transitions.get(currentState);
-      final State newState = actionStateMap.get(action);
+      final Map<Event, State> eventStateMap = transitions.get(currentState);
+      final State newState = eventStateMap.get(event);
       if (newState != null) {
-        dispatchCallbacks(context, currentState, Event.EXIT);
+        dispatchCallbacks(context, currentState, Phase.EXIT);
         context.reference().set(newState);
-        dispatchCallbacks(context, newState, Event.ENTER);
+        dispatchCallbacks(context, newState, Phase.ENTER);
         return newState;
       } else {
         return returnOrThrow(currentState,
-            () -> new StateMachineException("No transition for action " + action + " from state " + currentState));
+            () -> new StateMachineException("No transition for event " + event + " from state " + currentState));
       }
     }
   }
 
   public void enable(final State state,
-                     final Event event,
+                     final Phase phase,
                      final Consumer<Callback> contextConsumer) {
     if (callbackMap.get(state) == null) {
       returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     } else {
-      callbackMap.get(state)[event.ordinal()].add(contextConsumer);
+      callbackMap.get(state)[phase.ordinal()].add(contextConsumer);
     }
   }
 
   public void disable(final State state,
-                      final Event event,
+                      final Phase phase,
                       final Consumer<Callback> contextConsumer) {
     if (callbackMap.get(state) == null) {
       returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     } else {
-      callbackMap.get(state)[event.ordinal()].remove(contextConsumer);
+      callbackMap.get(state)[phase.ordinal()].remove(contextConsumer);
     }
   }
 
   private void dispatchCallbacks(final Context context,
                                  final State currentState,
-                                 final Event event) {
+                                 final Phase phase) {
     final Set<Consumer<Callback>>[] callbacks = callbackMap.get(currentState);
     final Callback callback = ImmutableCallback.builder()
         .context(context)
         .state(currentState)
-        .event(event)
+        .event(phase)
         .build();
     // TODO: Do this safely
-    callbacks[event.ordinal()].forEach(consumer -> consumer.accept(callback));
+    callbacks[phase.ordinal()].forEach(consumer -> consumer.accept(callback));
   }
 
   private <T> T returnOrThrow(final T t,
@@ -121,7 +121,7 @@ public class StateMachineDefinition {
 
   @SuppressWarnings("unchecked")
   private Set<Consumer<Callback>>[] buildList() {
-    return Arrays.stream(Event.values())
+    return Arrays.stream(Phase.values())
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
 
