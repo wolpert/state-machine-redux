@@ -1,21 +1,15 @@
-package com.codeheadsystems.smr.impl;
+package com.codeheadsystems.smr;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.codeheadsystems.smr.Event;
-import com.codeheadsystems.smr.ImmutableEvent;
-import com.codeheadsystems.smr.ImmutableState;
-import com.codeheadsystems.smr.State;
-import com.codeheadsystems.smr.StateMachine;
-import com.codeheadsystems.smr.StateMachineException;
 import com.codeheadsystems.smr.callback.Callback;
 import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-class StateMachineImplTest {
+class StateMachineTest {
 
   private static final State ONE = ImmutableState.of("one");
   private static final State TWO = ImmutableState.of("two");
