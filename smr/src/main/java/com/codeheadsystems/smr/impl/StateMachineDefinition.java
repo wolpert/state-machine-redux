@@ -1,14 +1,13 @@
 package com.codeheadsystems.smr.impl;
 
 import com.codeheadsystems.smr.Context;
+import com.codeheadsystems.smr.Dispatcher;
 import com.codeheadsystems.smr.Event;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachineException;
 import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.ImmutableCallback;
 import com.codeheadsystems.smr.callback.Phase;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
 public class StateMachineDefinition {
 
   private final Map<State, Map<Event, State>> transitions;
-  private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
+  private final Dispatcher dispatcher;
   private final boolean useExceptions;
   private final State initialState;
 
@@ -29,8 +28,7 @@ public class StateMachineDefinition {
     this.transitions = builder.transitions;
     this.initialState = builder.initialState;
     this.useExceptions = builder.useExceptions;
-    this.callbackMap = states().stream()
-        .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
+    this.dispatcher = new DispatcherImpl(builder);
   }
 
   public static StateMachineDefinition.Builder builder() {
@@ -54,7 +52,7 @@ public class StateMachineDefinition {
     if (!transitions.containsKey(currentState)) {
       returnOrThrow(false, () -> new StateMachineException("State " + currentState + " is not in the state machine."));
     } else {
-      dispatchCallbacks(context, currentState, Phase.TICK);
+      dispatcher.dispatchCallbacks(context, currentState, Phase.TICK);
     }
   }
 
@@ -67,7 +65,7 @@ public class StateMachineDefinition {
       final Map<Event, State> eventStateMap = transitions.get(currentState);
       final State newState = eventStateMap.get(event);
       if (newState != null) {
-        handleTransitionEvent(context, currentState, newState);
+        dispatcher.handleTransitionEvent(context, currentState, newState);
         return newState;
       } else {
         return returnOrThrow(currentState,
@@ -79,48 +77,21 @@ public class StateMachineDefinition {
   public void enable(final State state,
                      final Phase phase,
                      final Consumer<Callback> contextConsumer) {
-    if (callbackMap.get(state) == null) {
+    if (transitions.get(state) == null) {
       returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     } else {
-      callbackMap.get(state)[phase.ordinal()].add(contextConsumer);
+      dispatcher.enable(state, phase, contextConsumer);
     }
   }
 
   public void disable(final State state,
                       final Phase phase,
                       final Consumer<Callback> contextConsumer) {
-    if (callbackMap.get(state) == null) {
+    if (transitions.get(state) == null) {
       returnOrThrow(false, () -> new StateMachineException("State " + state + " is not in the state machine."));
     } else {
-      callbackMap.get(state)[phase.ordinal()].remove(contextConsumer);
+      dispatcher.disable(state, phase, contextConsumer);
     }
-  }
-
-  /**
-   * TODO: This method needs to be handled with care. Need to consider if we want to 1) back out of events if
-   * things failed, 2) keep it simple but incomplete, 3) allow for various implementations. (Most likely).
-   *
-   * @param context      that has state being changed.
-   * @param currentState the from state.
-   * @param newState     the too state.
-   */
-  private void handleTransitionEvent(final Context context, final State currentState, final State newState) {
-    dispatchCallbacks(context, currentState, Phase.EXIT);
-    context.reference().set(newState); // TODO: Gate this and validate old context is what we have.
-    dispatchCallbacks(context, newState, Phase.ENTER);
-  }
-
-  private void dispatchCallbacks(final Context context,
-                                 final State currentState,
-                                 final Phase phase) {
-    final Set<Consumer<Callback>>[] callbacks = callbackMap.get(currentState);
-    final Callback callback = ImmutableCallback.builder()
-        .context(context)
-        .state(currentState)
-        .event(phase)
-        .build();
-    // TODO: Do this safely
-    callbacks[phase.ordinal()].forEach(consumer -> consumer.accept(callback));
   }
 
   private <T> T returnOrThrow(final T t,
