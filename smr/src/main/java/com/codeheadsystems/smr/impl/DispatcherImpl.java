@@ -3,7 +3,7 @@ package com.codeheadsystems.smr.impl;
 import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.Callback;
-import com.codeheadsystems.smr.callback.ImmutableCallback;
+import com.codeheadsystems.smr.ImmutableCallback;
 import com.codeheadsystems.smr.Phase;
 import java.util.Arrays;
 import java.util.HashMap;

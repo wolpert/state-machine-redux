@@ -3,7 +3,6 @@ package com.codeheadsystems.smr;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.codeheadsystems.smr.callback.ImmutableCallback;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
