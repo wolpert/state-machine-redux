@@ -130,13 +130,39 @@ public class StateMachine extends Context.Impl {
     return t;
   }
 
-  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> {
+  public static class Builder {
 
-    @Override
+    private StateMachineDefinition stateMachineDefinition;
+    private Dispatcher dispatcher;
+    private boolean useExceptions;
+
+    public Builder() {
+      this.useExceptions = false;
+    }
+
+    public Builder withStateMachineDefinition(final StateMachineDefinition stateMachineDefinition) {
+      this.stateMachineDefinition = stateMachineDefinition;
+      return this;
+    }
+
+    public Builder withDispatcher(final Dispatcher dispatcher) {
+      this.dispatcher = dispatcher;
+      return this;
+    }
+
+    public Builder withUseExceptions(final boolean useExceptions) {
+      this.useExceptions = useExceptions;
+      return this;
+    }
+
     public StateMachine build() {
-      final StateMachineDefinition definition = new StateMachineDefinition(this);
-      final Dispatcher dispatcher = new SynchronousDispatcher(states, useExceptions);
-      return new StateMachine(definition, dispatcher, useExceptions);
+      if (stateMachineDefinition == null) {
+        throw new StateMachineException("StateMachineDefinition is required.");
+      }
+      if (dispatcher == null) {
+        dispatcher = new SynchronousDispatcher(stateMachineDefinition.states(), useExceptions);
+      }
+      return new StateMachine(stateMachineDefinition, dispatcher, useExceptions);
     }
 
   }

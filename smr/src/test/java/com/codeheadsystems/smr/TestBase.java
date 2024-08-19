@@ -1,5 +1,6 @@
 package com.codeheadsystems.smr;
 
+
 public class TestBase {
 
   public static final State ONE = ImmutableState.of("one");
@@ -10,19 +11,21 @@ public class TestBase {
   public static final Event TO_THREE = ImmutableEvent.of("ToThree");
   public static final Event TO_ONE = ImmutableEvent.of("ToOne");
 
-  public StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> builder(boolean withException) {
-    return StateMachine.builder()
-        .withExceptions(withException)
-        .addState(ONE).addState(TWO).addState(THREE)
-        .setInitialState(ONE)
-        .addTransition(ONE, TO_TWO, TWO)
-        .addTransition(TWO, TO_THREE, THREE)
-        .addTransition(THREE, TO_TWO, TWO)
-        .addTransition(TWO, TO_ONE, ONE);
-  }
+  protected StateMachineDefinition stateMachineDefinition = StateMachineDefinition.builder()
+      .addState(ONE).addState(TWO).addState(THREE)
+      .setInitialState(ONE)
+      .addTransition(ONE, TO_TWO, TWO)
+      .addTransition(TWO, TO_THREE, THREE)
+      .addTransition(THREE, TO_TWO, TWO)
+      .addTransition(TWO, TO_ONE, ONE)
+      .build();
+
 
   public StateMachine setUpStateMachine(boolean withException) {
-    return builder(withException).build();
+    return StateMachine.builder()
+        .withUseExceptions(withException)
+        .withStateMachineDefinition(stateMachineDefinition)
+        .build();
   }
 
 }
