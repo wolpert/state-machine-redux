@@ -1,7 +1,8 @@
-package com.codeheadsystems.smr.impl;
+package com.codeheadsystems.smr.dispatcher;
 
 import com.codeheadsystems.smr.Callback;
 import com.codeheadsystems.smr.Context;
+import com.codeheadsystems.smr.Dispatcher;
 import com.codeheadsystems.smr.ImmutableCallback;
 import com.codeheadsystems.smr.Phase;
 import com.codeheadsystems.smr.State;
@@ -15,22 +16,23 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
+public class SynchronousDispatcher implements Dispatcher {
 
-  private static final Logger log = LoggerFactory.getLogger(DispatcherImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SynchronousDispatcher.class);
 
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
-  public DispatcherImpl(final Set<State> states, final boolean useExceptions) {
-    log.info("DispatcherImpl()");
+  public SynchronousDispatcher(final Set<State> states,
+                               final boolean useExceptions) {
+    log.info("SynchronousDispatcher()");
     this.useExceptions = useExceptions;
     this.callbackMap = states.stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
   }
 
-  public static DispatcherImpl.Builder builder() {
-    return new DispatcherImpl.Builder();
+  public static SynchronousDispatcher.Builder builder() {
+    return new SynchronousDispatcher.Builder();
   }
 
   @Override
@@ -58,7 +60,9 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
    * @param newState     the too state.
    */
   @Override
-  public void handleTransitionEvent(final Context context, final State currentState, final State newState) {
+  public void handleTransitionEvent(final Context context,
+                                    final State currentState,
+                                    final State newState) {
     log.trace("handleTransitionEvent({}, {}, {})", context, currentState, newState);
     dispatchCallbacks(context, currentState, Phase.EXIT);
     final State previousState = context.reference().getAndSet(newState);
@@ -93,11 +97,11 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
 
-  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<DispatcherImpl> {
+  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<SynchronousDispatcher> {
 
     @Override
-    public DispatcherImpl build() {
-      return new DispatcherImpl(states, useExceptions);
+    public SynchronousDispatcher build() {
+      return new SynchronousDispatcher(states, useExceptions);
     }
 
   }

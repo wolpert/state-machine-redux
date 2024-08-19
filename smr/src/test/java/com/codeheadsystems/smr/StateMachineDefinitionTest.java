@@ -1,9 +1,7 @@
-package com.codeheadsystems.smr.impl;
+package com.codeheadsystems.smr;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.codeheadsystems.smr.StateMachineDefinition;
-import com.codeheadsystems.smr.TestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

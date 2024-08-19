@@ -2,7 +2,7 @@ package com.codeheadsystems.smr;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.codeheadsystems.smr.impl.DispatcherImpl;
+import com.codeheadsystems.smr.dispatcher.SynchronousDispatcher;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -135,7 +135,7 @@ public class StateMachine extends Context.Impl {
     @Override
     public StateMachine build() {
       final StateMachineDefinition definition = new StateMachineDefinition(this);
-      final Dispatcher dispatcher = new DispatcherImpl(states, useExceptions);
+      final Dispatcher dispatcher = new SynchronousDispatcher(states, useExceptions);
       return new StateMachine(definition, dispatcher, useExceptions);
     }
 

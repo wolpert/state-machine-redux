@@ -1,4 +1,4 @@
-package com.codeheadsystems.smr.impl;
+package com.codeheadsystems.smr.dispatcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DispatcherImplTest extends TestBase {
+class SynchronousDispatcherTest extends TestBase {
 
   @Mock private Consumer<Callback> consumer;
   @Mock private Context context;
@@ -35,7 +35,7 @@ class DispatcherImplTest extends TestBase {
   @BeforeEach
   void setUp() {
     final StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> builder = builder(false);
-    dispatcher = new DispatcherImpl(builder.build().states(), false);
+    dispatcher = new SynchronousDispatcher(builder.build().states(), false);
   }
 
   @Test
