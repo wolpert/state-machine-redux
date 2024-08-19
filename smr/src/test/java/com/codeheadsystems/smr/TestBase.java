@@ -1,7 +1,5 @@
 package com.codeheadsystems.smr;
 
-import com.codeheadsystems.smr.impl.StateMachineDefinitionBuilder;
-
 public class TestBase {
 
   public static final State ONE = ImmutableState.of("one");
@@ -12,7 +10,7 @@ public class TestBase {
   public static final Event TO_THREE = ImmutableEvent.of("ToThree");
   public static final Event TO_ONE = ImmutableEvent.of("ToOne");
 
-  public StateMachineDefinitionBuilder<StateMachine> builder(boolean withException) {
+  public StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> builder(boolean withException) {
     return StateMachine.builder()
         .withExceptions(withException)
         .addState(ONE).addState(TWO).addState(THREE)

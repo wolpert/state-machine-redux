@@ -3,8 +3,6 @@ package com.codeheadsystems.smr;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.codeheadsystems.smr.impl.DispatcherImpl;
-import com.codeheadsystems.smr.impl.StateMachineDefinition;
-import com.codeheadsystems.smr.impl.StateMachineDefinitionBuilder;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -132,12 +130,12 @@ public class StateMachine extends Context.Impl {
     return t;
   }
 
-  public static class Builder extends StateMachineDefinitionBuilder<StateMachine> {
+  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> {
 
     @Override
     public StateMachine build() {
       final StateMachineDefinition definition = new StateMachineDefinition(this);
-      final Dispatcher dispatcher = new DispatcherImpl(this);
+      final Dispatcher dispatcher = new DispatcherImpl(states, useExceptions);
       return new StateMachine(definition, dispatcher, useExceptions);
     }
 

@@ -2,7 +2,7 @@ package com.codeheadsystems.smr.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.codeheadsystems.smr.StateMachine;
+import com.codeheadsystems.smr.StateMachineDefinition;
 import com.codeheadsystems.smr.TestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ class StateMachineDefinitionTest extends TestBase {
 
   @BeforeEach
   void setup() {
-    final StateMachineDefinitionBuilder<?> builder = builder(false);
+    final StateMachineDefinition.StateMachineDefinitionBuilder<?> builder = builder(false);
     definition = new StateMachineDefinition(builder);
   }
 

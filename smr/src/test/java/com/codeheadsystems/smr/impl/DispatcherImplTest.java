@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.Dispatcher;
 import com.codeheadsystems.smr.StateMachine;
+import com.codeheadsystems.smr.StateMachineDefinition;
 import com.codeheadsystems.smr.TestBase;
 import com.codeheadsystems.smr.Callback;
 import com.codeheadsystems.smr.Phase;
@@ -33,8 +34,8 @@ class DispatcherImplTest extends TestBase {
 
   @BeforeEach
   void setUp() {
-    final StateMachineDefinitionBuilder<StateMachine> builder = builder(false);
-    dispatcher = new DispatcherImpl(builder);
+    final StateMachineDefinition.StateMachineDefinitionBuilder<StateMachine> builder = builder(false);
+    dispatcher = new DispatcherImpl(builder.build().states(), false);
   }
 
   @Test

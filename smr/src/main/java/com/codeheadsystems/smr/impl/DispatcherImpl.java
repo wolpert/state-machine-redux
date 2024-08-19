@@ -5,6 +5,7 @@ import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.ImmutableCallback;
 import com.codeheadsystems.smr.Phase;
 import com.codeheadsystems.smr.State;
+import com.codeheadsystems.smr.StateMachineDefinition;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,10 +22,10 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
-  public DispatcherImpl(final StateMachineDefinitionBuilder<?> builder) {
+  public DispatcherImpl(final Set<State> states, final boolean useExceptions) {
     log.info("DispatcherImpl()");
-    this.useExceptions = builder.useExceptions;
-    this.callbackMap = builder.states.stream()
+    this.useExceptions = useExceptions;
+    this.callbackMap = states.stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
   }
 
@@ -92,11 +93,11 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
   }
 
-  public static class Builder extends StateMachineDefinitionBuilder<DispatcherImpl> {
+  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<DispatcherImpl> {
 
     @Override
     public DispatcherImpl build() {
-      return new DispatcherImpl(this);
+      return new DispatcherImpl(states, useExceptions);
     }
 
   }
