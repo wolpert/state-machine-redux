@@ -1,14 +1,13 @@
 package com.codeheadsystems.smr;
 
-import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Phase;
 import com.codeheadsystems.smr.impl.StateMachineImpl;
 import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * State machines are immutable once built regarding the states and available
- * transitions.
+ * State machines manage the current state(context) and transitions between states.
+ * It uses a state machine definition to determine the valid transitions. The dispatcher
+ * is used to handle the callbacks for transition listeners.
  */
 public interface StateMachine extends Context {
 

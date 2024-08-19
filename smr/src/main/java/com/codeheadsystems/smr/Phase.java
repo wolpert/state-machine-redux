@@ -1,4 +1,4 @@
-package com.codeheadsystems.smr.callback;
+package com.codeheadsystems.smr;
 
 /**
  * The state machine transition phases. When the event is dispatched, the

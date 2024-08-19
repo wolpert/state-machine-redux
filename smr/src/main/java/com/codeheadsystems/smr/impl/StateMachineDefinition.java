@@ -9,6 +9,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A state machine definition is a set of states and transitions between them.
+ * It is immutable once built.
+ */
 public class StateMachineDefinition {
 
   private static final Logger log = LoggerFactory.getLogger(StateMachineDefinition.class);
@@ -29,22 +33,46 @@ public class StateMachineDefinition {
     return new StateMachineDefinition.Builder();
   }
 
+  /**
+   * New state machines start with this initial state.
+   * @return the initial state.
+   */
   public State initialState() {
     return initialState;
   }
 
+  /**
+   * List of all states within the state machine.
+   * @return set of states.
+   */
   public Set<State> states() {
     return transitions.keySet();
   }
 
+  /**
+   * List of all events that can be triggered from the given state.
+   * @param state that owns the events.
+   * @return set of events.
+   */
   public Set<Event> events(final State state) {
     return transitions.get(state).keySet();
   }
 
+  /**
+   * Check if the state machine has the given state.
+   * @param state to check.
+   * @return true if the state is in the state machine.
+   */
   public boolean hasState(final State state) {
     return transitions.containsKey(state);
   }
 
+  /**
+   * Gets the next state for the given state and event. May not exist so return an optional.
+   * @param state to check.
+   * @param event to check.
+   * @return the optional that contains the next state, if any.
+   */
   public Optional<State> forEvent(final State state,
                                   final Event event) {
     if (hasState(state)) {

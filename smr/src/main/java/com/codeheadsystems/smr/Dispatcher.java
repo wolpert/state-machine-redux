@@ -1,9 +1,11 @@
 package com.codeheadsystems.smr;
 
-import com.codeheadsystems.smr.callback.Callback;
-import com.codeheadsystems.smr.callback.Phase;
 import java.util.function.Consumer;
 
+/**
+ * Defines how we dispatch callbacks for transitions within a state machine.
+ * It is customizable so we allow for multiple callbacks.
+ */
 public interface Dispatcher {
   void enable(State state,
               Phase phase,
