@@ -6,13 +6,18 @@ import com.codeheadsystems.smr.StateMachineException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StateMachineDefinition {
+
+  private static final Logger log = LoggerFactory.getLogger(StateMachineDefinition.class);
 
   private final Map<State, Map<Event, State>> transitions;
   private final State initialState;
 
   StateMachineDefinition(final StateMachineDefinitionBuilder<?> builder) {
+    log.info("StateMachineDefinition()");
     if (builder.initialState == null) {
       throw new StateMachineException("Initial state is required.");
     }

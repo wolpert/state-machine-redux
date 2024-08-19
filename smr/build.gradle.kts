@@ -18,11 +18,14 @@ repositories {
 dependencies {
 
     implementation(libs.jsr305)
+    implementation(libs.slf4j.api)
     implementation(libs.immutables.annotations)
     annotationProcessor(libs.immutables.value)
 
     testImplementation(libs.bundles.testing)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.logback.classic)
+    testImplementation(libs.logback.core)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

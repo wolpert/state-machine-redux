@@ -11,13 +11,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
+
+  private static final Logger log = LoggerFactory.getLogger(DispatcherImpl.class);
 
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
   DispatcherImpl(final StateMachineDefinitionBuilder<?> builder) {
+    log.info("DispatcherImpl()");
     this.useExceptions = builder.useExceptions;
     this.callbackMap = builder.states.stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
@@ -31,6 +36,7 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
   public void enable(final State state,
                      final Phase phase,
                      final Consumer<Callback> contextConsumer) {
+    log.trace("enable({}, {}, {})", state, phase, contextConsumer);
     callbackMap.get(state)[phase.ordinal()].add(contextConsumer);
   }
 
@@ -38,6 +44,7 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
   public void disable(final State state,
                       final Phase phase,
                       final Consumer<Callback> contextConsumer) {
+    log.trace("disable({}, {}, {})", state, phase, contextConsumer);
     callbackMap.get(state)[phase.ordinal()].remove(contextConsumer);
   }
 
@@ -51,22 +58,32 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
    */
   @Override
   public void handleTransitionEvent(final Context context, final State currentState, final State newState) {
+    log.trace("handleTransitionEvent({}, {}, {})", context, currentState, newState);
     dispatchCallbacks(context, currentState, Phase.EXIT);
-    context.reference().set(newState); // TODO: Gate this and validate old context is what we have.
+    final State previousState = context.reference().getAndSet(newState);
+    if (!previousState.equals(currentState)) {
+      log.warn("handleTransitionEvent:state: {} != {}", previousState, currentState);
+    }
     dispatchCallbacks(context, newState, Phase.ENTER);
   }
 
   public void dispatchCallbacks(final Context context,
                                 final State currentState,
                                 final Phase phase) {
+    log.trace("dispatchCallbacks({}, {}, {})", context, currentState, phase);
     final Set<Consumer<Callback>>[] callbacks = callbackMap.get(currentState);
     final Callback callback = ImmutableCallback.builder()
         .context(context)
         .state(currentState)
-        .event(phase)
+        .phase(phase)
         .build();
-    // TODO: Do this safely
-    callbacks[phase.ordinal()].forEach(consumer -> consumer.accept(callback));
+    callbacks[phase.ordinal()].forEach(consumer -> {
+      try {
+        consumer.accept(callback);
+      } catch (RuntimeException e) {
+        log.error("dispatchCallbacks:error: {}", consumer, e);
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")

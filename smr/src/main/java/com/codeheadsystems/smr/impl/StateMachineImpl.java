@@ -1,5 +1,7 @@
 package com.codeheadsystems.smr.impl;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.Dispatcher;
 import com.codeheadsystems.smr.Event;
@@ -12,8 +14,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.slf4j.Logger;
 
 public class StateMachineImpl extends Context.Impl implements StateMachine {
+
+  private static final Logger log = getLogger(StateMachineImpl.class);
 
   private final StateMachineDefinition definition;
   private final Dispatcher dispatcher;
@@ -23,6 +28,7 @@ public class StateMachineImpl extends Context.Impl implements StateMachine {
                    final Dispatcher dispatcher,
                    final boolean useExceptions) {
     super(definition.initialState());
+    log.info("StateMachineImpl():{}", definition.initialState());
     this.definition = definition;
     this.dispatcher = dispatcher;
     this.useExceptions = useExceptions;
@@ -56,12 +62,14 @@ public class StateMachineImpl extends Context.Impl implements StateMachine {
   @Override
   public State dispatch(final Event event) {
     final State currentState = state();
+    log.trace("dispatch({},{})", event, currentState);
     final Optional<State> optionalNewState = definition.forEvent(currentState, event);
     if (optionalNewState.isPresent()) {
       final State newState = optionalNewState.get();
       dispatcher.handleTransitionEvent(this, currentState, newState);
       return newState;
     } else {
+      log.warn("No transition for event {} from state {}", event, currentState);
       return returnOrThrow(currentState,
           () -> new StateMachineException("No transition for event " + event + " from state " + currentState));
     }

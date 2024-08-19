@@ -7,7 +7,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface Callback {
 
-  Phase event();
+  Phase phase();
 
   State state();
 

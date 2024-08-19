@@ -9,14 +9,8 @@ import com.codeheadsystems.smr.callback.Phase;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-class StateMachineTest {
+class StateMachineTest extends TestBase {
 
-  private static final State ONE = ImmutableState.of("one");
-  private static final State TWO = ImmutableState.of("two");
-  private static final State THREE = ImmutableState.of("three");
-  private static final Event TO_TWO = ImmutableEvent.of("ToTwo");
-  private static final Event TO_THREE = ImmutableEvent.of("ToThree");
-  private static final Event TO_ONE = ImmutableEvent.of("ToOne");
 
   private static Callback getContext(final StateMachine stateMachine,
                                      final State state,
@@ -24,19 +18,7 @@ class StateMachineTest {
     return ImmutableCallback.builder()
         .context(stateMachine)
         .state(state)
-        .event(phase)
-        .build();
-  }
-
-  StateMachine setUpStateMachine(boolean withException) {
-    return StateMachine.builder()
-        .withExceptions(withException)
-        .addState(ONE).addState(TWO).addState(THREE)
-        .setInitialState(ONE)
-        .addTransition(ONE, TO_TWO, TWO)
-        .addTransition(TWO, TO_THREE, THREE)
-        .addTransition(THREE, TO_TWO, TWO)
-        .addTransition(TWO, TO_ONE, ONE)
+        .phase(phase)
         .build();
   }
 
