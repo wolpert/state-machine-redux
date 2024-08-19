@@ -14,8 +14,8 @@ public abstract class StateMachineDefinitionBuilder<T> {
 
   final Set<State> states;
   final Map<State, Map<Event, State>> transitions;
+  protected boolean useExceptions;
   State initialState;
-  boolean useExceptions;
 
   public StateMachineDefinitionBuilder() {
     this.states = new HashSet<>();

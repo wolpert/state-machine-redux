@@ -20,7 +20,7 @@ public class StateMachineDefinition {
   private final Map<State, Map<Event, State>> transitions;
   private final State initialState;
 
-  StateMachineDefinition(final StateMachineDefinitionBuilder<?> builder) {
+  public StateMachineDefinition(final StateMachineDefinitionBuilder<?> builder) {
     log.info("StateMachineDefinition()");
     if (builder.initialState == null) {
       throw new StateMachineException("Initial state is required.");
@@ -35,6 +35,7 @@ public class StateMachineDefinition {
 
   /**
    * New state machines start with this initial state.
+   *
    * @return the initial state.
    */
   public State initialState() {
@@ -43,6 +44,7 @@ public class StateMachineDefinition {
 
   /**
    * List of all states within the state machine.
+   *
    * @return set of states.
    */
   public Set<State> states() {
@@ -51,6 +53,7 @@ public class StateMachineDefinition {
 
   /**
    * List of all events that can be triggered from the given state.
+   *
    * @param state that owns the events.
    * @return set of events.
    */
@@ -60,6 +63,7 @@ public class StateMachineDefinition {
 
   /**
    * Check if the state machine has the given state.
+   *
    * @param state to check.
    * @return true if the state is in the state machine.
    */
@@ -69,6 +73,7 @@ public class StateMachineDefinition {
 
   /**
    * Gets the next state for the given state and event. May not exist so return an optional.
+   *
    * @param state to check.
    * @param event to check.
    * @return the optional that contains the next state, if any.

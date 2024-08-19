@@ -1,10 +1,10 @@
 package com.codeheadsystems.smr.impl;
 
-import com.codeheadsystems.smr.Context;
-import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.Callback;
+import com.codeheadsystems.smr.Context;
 import com.codeheadsystems.smr.ImmutableCallback;
 import com.codeheadsystems.smr.Phase;
+import com.codeheadsystems.smr.State;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class DispatcherImpl implements com.codeheadsystems.smr.Dispatcher {
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
   private final boolean useExceptions;
 
-  DispatcherImpl(final StateMachineDefinitionBuilder<?> builder) {
+  public DispatcherImpl(final StateMachineDefinitionBuilder<?> builder) {
     log.info("DispatcherImpl()");
     this.useExceptions = builder.useExceptions;
     this.callbackMap = builder.states.stream()
