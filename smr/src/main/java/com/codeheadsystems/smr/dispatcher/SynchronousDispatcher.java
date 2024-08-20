@@ -65,13 +65,19 @@ public class SynchronousDispatcher implements Dispatcher {
                                     final State newState) {
     log.trace("handleTransitionEvent({}, {}, {})", context, currentState, newState);
     dispatchCallbacks(context, currentState, Phase.EXIT);
-    final State previousState = context.reference().getAndSet(newState);
+    final State previousState = changeState(context, currentState, newState);
     if (!previousState.equals(currentState)) {
       log.warn("handleTransitionEvent:state: {} != {}", previousState, currentState);
     }
     dispatchCallbacks(context, newState, Phase.ENTER);
   }
 
+  @Override
+  public State changeState(final Context context, final State currentState, final State newState) {
+    return context.reference().getAndSet(newState);
+  }
+
+  @Override
   public void dispatchCallbacks(final Context context,
                                 final State currentState,
                                 final Phase phase) {
@@ -83,12 +89,17 @@ public class SynchronousDispatcher implements Dispatcher {
         .phase(phase)
         .build();
     callbacks[phase.ordinal()].forEach(consumer -> {
-      try {
-        consumer.accept(callback);
-      } catch (RuntimeException e) {
-        log.error("dispatchCallbacks:error: {}", consumer, e);
-      }
+      executeCallback(consumer, callback);
     });
+  }
+
+  @Override
+  public void executeCallback(final Consumer<Callback> consumer, final Callback callback) {
+    try {
+      consumer.accept(callback);
+    } catch (RuntimeException e) {
+      log.error("dispatchCallbacks:error: {}", consumer, e);
+    }
   }
 
   @SuppressWarnings("unchecked")

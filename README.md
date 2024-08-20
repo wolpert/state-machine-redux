@@ -27,12 +27,10 @@ The mistake with the original implementation was that this complex pattern
 was built first, making it impossible to understand the simple use-case.
 
 ### TODO
-1. Move the enable/disable completely to the dispatcher.
-2. Make the dispatcher available from the state machine.
-3. Ability to create the state machine definition from a file.
-4. Hooks at each stage.
+1. Ability to create the state machine definition from a file.
+2. Hooks at each stage.
    1. Metrics extension
-5. Consider a State Machine Engine to handle multiple contexts for the same state machine.
+3. Consider a State Machine Engine to handle multiple contexts for the same state machine.
 
 ## Example
 
