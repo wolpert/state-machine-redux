@@ -7,4 +7,8 @@ public class StateMachineException extends RuntimeException {
   public StateMachineException(String message) {
     super(message);
   }
+
+  public StateMachineException(final String message, final Exception e) {
+    super(message, e);
+  }
 }

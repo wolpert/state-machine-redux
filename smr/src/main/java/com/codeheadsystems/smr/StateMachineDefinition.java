@@ -3,6 +3,7 @@ package com.codeheadsystems.smr;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -40,6 +41,15 @@ public class StateMachineDefinition {
    */
   public State initialState() {
     return initialState;
+  }
+
+  /**
+   * All transitions within the state machine.
+   *
+   * @return map of state to map of event to state.
+   */
+  public Map<State, Map<Event, State>> getTransitions() {
+    return transitions;
   }
 
   /**
@@ -87,6 +97,19 @@ public class StateMachineDefinition {
     }
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    final StateMachineDefinition that = (StateMachineDefinition) o;
+    return Objects.equals(transitions, that.transitions) && Objects.equals(initialState, that.initialState);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(transitions, initialState);
+  }
+
   public static class Builder extends StateMachineDefinitionBuilder<StateMachineDefinition> {
 
     @Override
@@ -101,17 +124,11 @@ public class StateMachineDefinition {
 
     protected final Set<State> states;
     protected final Map<State, Map<Event, State>> transitions;
-    protected boolean useExceptions;
     State initialState;
 
     public StateMachineDefinitionBuilder() {
       this.states = new HashSet<>();
       this.transitions = new HashMap<>();
-    }
-
-    public StateMachineDefinitionBuilder<T> withExceptions(boolean useExceptions) {
-      this.useExceptions = useExceptions;
-      return this;
     }
 
     public StateMachineDefinitionBuilder<T> addState(final String name) {

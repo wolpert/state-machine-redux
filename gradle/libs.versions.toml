@@ -5,6 +5,7 @@
 assertj = "3.26.3"
 jsr305 = "3.0.2"
 immutables = '2.10.1'
+jackson = '2.17.2'
 junit-jupiter = "5.11.0"
 logback = '1.5.7'
 mokito = '5.12.0'
@@ -14,6 +15,7 @@ slf4j = '2.0.16'
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 immutables-value = { module = "org.immutables:value", version.ref = "immutables" }
 immutables-annotations = { module = "org.immutables:value-annotations", version.ref = "immutables" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
@@ -24,3 +26,4 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 [bundles]
 testing = ["mockito-core", "mockito-junit-jupiter", "assertj", "junit-jupiter"]
+jackson = ['jackson-dataformat-yaml']

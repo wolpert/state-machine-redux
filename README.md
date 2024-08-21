@@ -27,10 +27,11 @@ The mistake with the original implementation was that this complex pattern
 was built first, making it impossible to understand the simple use-case.
 
 ### TODO
-1. Ability to create the state machine definition from a file.
-2. Hooks at each stage.
+1. ~~Ability to create the state machine definition from a file.~~
+2. ~~Hooks at each stage.~~
    1. Metrics extension
-3. Consider a State Machine Engine to handle multiple contexts for the same state machine.
+3. Publish library to maven
+4. Consider a State Machine Engine to handle multiple contexts for the same state machine.
 
 ## Example
 
