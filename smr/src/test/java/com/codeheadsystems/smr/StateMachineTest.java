@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 
 class StateMachineTest extends TestBase {
@@ -101,6 +102,70 @@ class StateMachineTest extends TestBase {
     stateMachine.tick();
     assertThat(capture.contexts).hasSize(2);
     assertThat(capture.contexts).containsExactly(expected, expected);
+  }
+
+  @Test
+  void ticks_withDecorator() {
+    StateMachine stateMachine = setUpStateMachine(false, new TestDecorator(0), new TestDecorator(1));
+    Callback expected = getContext(stateMachine, ONE, Phase.TICK);
+    Capture capture = new Capture();
+    stateMachine.enable(ONE, Phase.TICK, capture::capture);
+    stateMachine.tick();
+    stateMachine.tick();
+    assertThat(capture.contexts).hasSize(2);
+    assertThat(capture.contexts).containsExactly(expected, expected);
+    assertThat(TestDecorator.ordering()).isEqualTo("1010"); // last decorator is hit first.
+  }
+
+  static class TestDecorator implements Decorator<Dispatcher>, Dispatcher {
+    private static StringBuilder ordering = new StringBuilder();
+    private final int myCount;
+    private Dispatcher original;
+
+    TestDecorator(int myCount) {
+      this.myCount = myCount;
+    }
+
+    @Override
+    public Dispatcher decorate(final Dispatcher dispatcher) {
+      original = dispatcher;
+      return this;
+    }
+
+    public static String ordering() {
+      return ordering.toString();
+    }
+
+    @Override
+    public void enable(final State state, final Phase phase, final Consumer<Callback> contextConsumer) {
+      original.enable(state, phase, contextConsumer);
+    }
+
+    @Override
+    public void disable(final State state, final Phase phase, final Consumer<Callback> contextConsumer) {
+      original.disable(state, phase, contextConsumer);
+    }
+
+    @Override
+    public void handleTransitionEvent(final Context context, final State currentState, final State newState) {
+      original.handleTransitionEvent(context, currentState, newState);
+    }
+
+    @Override
+    public State changeState(final Context context, final State currentState, final State newState) {
+      return original.changeState(context, currentState, newState);
+    }
+
+    @Override
+    public void dispatchCallbacks(final Context context, final State currentState, final Phase phase) {
+      ordering.append(myCount);
+      original.dispatchCallbacks(context, currentState, phase);
+    }
+
+    @Override
+    public void executeCallback(final Consumer<Callback> consumer, final Callback callback) {
+      original.executeCallback(consumer, callback);
+    }
   }
 
   static class Capture {

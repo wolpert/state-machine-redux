@@ -21,18 +21,11 @@ public class SynchronousDispatcher implements Dispatcher {
   private static final Logger log = LoggerFactory.getLogger(SynchronousDispatcher.class);
 
   private final Map<State, Set<Consumer<Callback>>[]> callbackMap;
-  private final boolean useExceptions;
 
-  public SynchronousDispatcher(final Set<State> states,
-                               final boolean useExceptions) {
+  public SynchronousDispatcher(final Set<State> states) {
     log.info("SynchronousDispatcher()");
-    this.useExceptions = useExceptions;
     this.callbackMap = states.stream()
         .collect(HashMap::new, (map, state) -> map.put(state, buildList()), HashMap::putAll);
-  }
-
-  public static SynchronousDispatcher.Builder builder() {
-    return new SynchronousDispatcher.Builder();
   }
 
   @Override
@@ -106,15 +99,6 @@ public class SynchronousDispatcher implements Dispatcher {
   private Set<Consumer<Callback>>[] buildList() {
     return Arrays.stream(Phase.values())
         .map(event -> new HashSet<Consumer<Callback>>()).toArray(Set[]::new);
-  }
-
-  public static class Builder extends StateMachineDefinition.StateMachineDefinitionBuilder<SynchronousDispatcher> {
-
-    @Override
-    public SynchronousDispatcher build() {
-      return new SynchronousDispatcher(states, useExceptions);
-    }
-
   }
 
 }

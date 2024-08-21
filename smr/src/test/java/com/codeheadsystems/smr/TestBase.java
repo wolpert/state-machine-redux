@@ -21,9 +21,12 @@ public class TestBase {
       .build();
 
 
-  public StateMachine setUpStateMachine(boolean withException) {
-    return StateMachine.builder()
-        .withUseExceptions(withException)
+  public StateMachine setUpStateMachine(boolean withException, Decorator<Dispatcher>... decorators) {
+    StateMachine.Builder builder = StateMachine.builder();
+    for (Decorator<Dispatcher> decorator : decorators) {
+      builder.withDispatcherDecorator(decorator);
+    }
+    return builder.withUseExceptions(withException)
         .withStateMachineDefinition(stateMachineDefinition)
         .build();
   }

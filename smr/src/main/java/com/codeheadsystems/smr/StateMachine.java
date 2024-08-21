@@ -3,6 +3,8 @@ package com.codeheadsystems.smr;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.codeheadsystems.smr.dispatcher.SynchronousDispatcher;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -132,16 +134,23 @@ public class StateMachine extends Context.Impl {
 
   public static class Builder {
 
+    private final List<Decorator<Dispatcher>> dispatcherDecorators;
     private StateMachineDefinition stateMachineDefinition;
     private Dispatcher dispatcher;
     private boolean useExceptions;
 
     public Builder() {
       this.useExceptions = false;
+      this.dispatcherDecorators = new ArrayList<>();
     }
 
     public Builder withStateMachineDefinition(final StateMachineDefinition stateMachineDefinition) {
       this.stateMachineDefinition = stateMachineDefinition;
+      return this;
+    }
+
+    public Builder withDispatcherDecorator(final Decorator<Dispatcher> decorator) {
+      dispatcherDecorators.add(decorator);
       return this;
     }
 
@@ -160,9 +169,13 @@ public class StateMachine extends Context.Impl {
         throw new StateMachineException("StateMachineDefinition is required.");
       }
       if (dispatcher == null) {
-        dispatcher = new SynchronousDispatcher(stateMachineDefinition.states(), useExceptions);
+        dispatcher = new SynchronousDispatcher(stateMachineDefinition.states());
       }
-      return new StateMachine(stateMachineDefinition, dispatcher, useExceptions);
+      Dispatcher decoratoedDispatcher = dispatcher;
+      for (Decorator<Dispatcher> decorator : dispatcherDecorators) {
+        decoratoedDispatcher = decorator.decorate(decoratoedDispatcher);
+      }
+      return new StateMachine(stateMachineDefinition, decoratoedDispatcher, useExceptions);
     }
 
   }

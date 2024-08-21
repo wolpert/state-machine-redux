@@ -32,7 +32,7 @@ class SynchronousDispatcherTest extends TestBase {
 
   @BeforeEach
   void setUp() {
-    dispatcher = new SynchronousDispatcher(stateMachineDefinition.states(), false);
+    dispatcher = new SynchronousDispatcher(stateMachineDefinition.states());
   }
 
   @Test
