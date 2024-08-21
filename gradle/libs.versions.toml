@@ -25,5 +25,6 @@ mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 [bundles]
-testing = ["mockito-core", "mockito-junit-jupiter", "assertj", "junit-jupiter"]
 jackson = ['jackson-dataformat-yaml']
+logback = ['logback-classic', 'logback-core']
+testing = ["mockito-core", "mockito-junit-jupiter", "assertj", "junit-jupiter"]

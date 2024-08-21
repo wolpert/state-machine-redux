@@ -21,10 +21,9 @@ dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.slf4j.api)
 
-    testImplementation(libs.bundles.testing)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation(libs.logback.classic)
-    testImplementation(libs.logback.core)
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.bundles.logback)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

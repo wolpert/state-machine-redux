@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "smr"
-include("smr", "yml")
+include("smr", "smr-yml")
