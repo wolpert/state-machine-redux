@@ -7,6 +7,17 @@ for complexity as needed. It is designed to be usable for
 everything from games to business logic cases. It is a
 light-weight framework that can be extended.
 
+## Installation
+
+All libraries are available on maven central.
+
+| Library     | Purpose       | Version                                                                                       |
+|-------------|---------------|-----------------------------------------------------------------------------------------------|
+| smr         | Core Library  | ![State Machine Redux](https://img.shields.io/maven-central/v/com.codeheadsystems/smr)        |
+| smr-metrics | Metrics addon | ![State Machine Redux](https://img.shields.io/maven-central/v/com.codeheadsystems/smr-metrics) |
+| smr-yml     | YAML support  | ![State Machine Redux](https://img.shields.io/maven-central/v/com.codeheadsystems/smr-yml)    |
+
+
 ## Build out
 
 The goal is to put together a state machine that is self-contained.
