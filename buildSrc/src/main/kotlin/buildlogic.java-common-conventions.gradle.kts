@@ -5,10 +5,9 @@
 plugins {
     // Apply the java Plugin to add support for Java.
     java
+    `maven-publish`
+    signing
 }
-
-group = "com.codeheadsystems"
-version = "1.0.1-SNAPSHOT"
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -16,14 +15,6 @@ repositories {
 }
 
 dependencies {
-    constraints {
-        // Define dependency versions as constraints
-        implementation("org.apache.commons:commons-text:1.12.0")
-    }
-
-    // Use JUnit Jupiter for testing.
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.3")
-
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -38,4 +29,55 @@ java {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+tasks.javadoc {
+    if (JavaVersion.current().isJava9Compatible) {
+        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            pom {
+                name = "State Machine Redux"
+                description = "Core Feature Flag library"
+                url = "https://github.com/wolpert/state-machine-redux"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "wolpert"
+                        name = "Ned Wolpert"
+                        email = "ned.wolpert@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/wolpert/state-machine-redux.git"
+                    developerConnection = "scm:git:ssh://github.com/wolpert/state-machine-redux.git"
+                    url = "https://github.com/wolpert/state-machine-redux/"
+                }
+            }
+
+        }
+    }
+    repositories {
+        maven {
+            val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            name = "ossrh"
+            credentials(PasswordCredentials::class)
+        }
+    }
+}
+signing {
+    useGpgCmd()
+    sign(publishing.publications["mavenJava"])
 }
