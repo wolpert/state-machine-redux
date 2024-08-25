@@ -10,7 +10,6 @@ dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.slf4j.api)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(libs.bundles.testing)
     testImplementation(libs.bundles.logback)
 }

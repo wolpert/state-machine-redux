@@ -11,7 +11,6 @@ dependencies {
     implementation(libs.immutables.annotations)
     annotationProcessor(libs.immutables.value)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(libs.bundles.testing)
     testImplementation(libs.bundles.logback)
 
