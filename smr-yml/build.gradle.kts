@@ -1,7 +1,7 @@
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
     id("buildlogic.java-library-conventions")
+    id("buildlogic.java-publish-conventions")
 }
 
 dependencies {
