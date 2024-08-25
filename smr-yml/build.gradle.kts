@@ -7,14 +7,9 @@
 
 plugins {
     // Apply the java-library plugin for API and implementation separation.
-    `java-library`
     `maven-publish`
     signing
-}
-
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+    id("buildlogic.java-library-conventions")
 }
 
 dependencies {
@@ -28,19 +23,6 @@ dependencies {
     testImplementation(libs.bundles.logback)
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
-    withJavadocJar()
-    withSourcesJar()
-}
-
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
-}
 
 publishing {
     publications {
