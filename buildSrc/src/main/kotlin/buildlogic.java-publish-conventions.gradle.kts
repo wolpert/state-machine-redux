@@ -10,7 +10,7 @@ publishing {
             from(components["java"])
             pom {
                 name = "State Machine Redux"
-                description = "Core Feature Flag library"
+                description = "State Machine Redux: A simple state machine for Java."
                 url = "https://github.com/wolpert/state-machine-redux"
                 licenses {
                     license {
