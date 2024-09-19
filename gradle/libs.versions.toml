@@ -3,7 +3,7 @@
 
 [versions]
 assertj = "3.26.3"
-codehead-metrics = "2.0.5"
+codehead-metrics = "2.0.6"
 jsr305 = "3.0.2"
 immutables = '2.10.1'
 jackson = '2.17.2'
