@@ -2,12 +2,12 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-assertj = "3.26.3"
+assertj = "3.27.0"
 codehead-metrics = "2.0.9"
 jsr305 = "3.0.2"
 immutables = '2.10.1'
 jackson = '2.18.2'
-junit-jupiter = "5.11.3"
+junit-jupiter = "5.11.4"
 logback = '1.5.15'
 mokito = '5.14.2'
 slf4j = '2.0.16'
