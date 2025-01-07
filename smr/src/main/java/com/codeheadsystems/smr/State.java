@@ -8,6 +8,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface State {
 
+  static State of(String name) {
+    return ImmutableState.of(name);
+  }
+
   @Value.Parameter
   String name();
 

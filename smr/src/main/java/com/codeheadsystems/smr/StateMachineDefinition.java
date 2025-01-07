@@ -132,7 +132,7 @@ public class StateMachineDefinition {
     }
 
     public StateMachineDefinitionBuilder<T> addState(final String name) {
-      return addState(ImmutableState.of(name));
+      return addState(State.of(name));
     }
 
     public StateMachineDefinitionBuilder<T> addState(final State state) {

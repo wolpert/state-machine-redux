@@ -65,7 +65,7 @@ class StateMachineTest extends TestBase {
     StateMachine stateMachine = setUpStateMachine(true);
     assertThat(stateMachine.state()).isEqualTo(ONE);
     assertThatExceptionOfType(StateMachineException.class)
-        .isThrownBy(() -> stateMachine.dispatch(ImmutableEvent.of("unknown")));
+        .isThrownBy(() -> stateMachine.dispatch(Event.of("unknown")));
     assertThat(stateMachine.state()).isEqualTo(ONE);
   }
 
