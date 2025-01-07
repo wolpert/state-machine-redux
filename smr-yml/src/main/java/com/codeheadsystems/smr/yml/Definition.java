@@ -1,7 +1,7 @@
 package com.codeheadsystems.smr.yml;
 
-import com.codeheadsystems.smr.ImmutableEvent;
-import com.codeheadsystems.smr.ImmutableState;
+import com.codeheadsystems.smr.Event;
+import com.codeheadsystems.smr.State;
 import com.codeheadsystems.smr.StateMachineDefinition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashMap;
@@ -37,10 +37,10 @@ public class Definition {
     // add transitions
     transitions.forEach((state, eventMap) -> {
       eventMap.forEach((event, nextState) -> {
-        builder.addTransition(ImmutableState.of(state), ImmutableEvent.of(event), ImmutableState.of(nextState));
+        builder.addTransition(State.of(state), Event.of(event), State.of(nextState));
       });
     });
-    return builder.setInitialState(ImmutableState.of(initialState)).build();
+    return builder.setInitialState(State.of(initialState)).build();
   }
 
   public String getInitialState() {

@@ -3,13 +3,13 @@ package com.codeheadsystems.smr;
 
 public class TestBase {
 
-  public static final State ONE = ImmutableState.of("one");
-  public static final State TWO = ImmutableState.of("two");
-  public static final State THREE = ImmutableState.of("three");
-  public static final State FOUR = ImmutableState.of("four");
-  public static final Event TO_TWO = ImmutableEvent.of("ToTwo");
-  public static final Event TO_THREE = ImmutableEvent.of("ToThree");
-  public static final Event TO_ONE = ImmutableEvent.of("ToOne");
+  public static final State ONE = State.of("one");
+  public static final State TWO = State.of("two");
+  public static final State THREE = State.of("three");
+  public static final State FOUR = State.of("four");
+  public static final Event TO_TWO = Event.of("ToTwo");
+  public static final Event TO_THREE = Event.of("ToThree");
+  public static final Event TO_ONE = Event.of("ToOne");
 
   protected StateMachineDefinition stateMachineDefinition = StateMachineDefinition.builder()
       .addState(ONE).addState(TWO).addState(THREE)

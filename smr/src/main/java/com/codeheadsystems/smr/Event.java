@@ -9,6 +9,10 @@ import org.immutables.value.Value.Immutable;
 @Immutable
 public interface Event {
 
+  static Event of(String name) {
+    return ImmutableEvent.of(name);
+  }
+
   @Value.Parameter
   String name();
 
