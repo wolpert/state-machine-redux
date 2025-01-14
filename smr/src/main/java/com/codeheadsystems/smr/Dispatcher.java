@@ -16,6 +16,19 @@ public interface Dispatcher {
                Consumer<Callback> contextConsumer);
 
   /**
+   * Wrapper to use the event unaware method in case you want to make decisions based on the
+   * event. This is not recommended as it breaks the state machine pattern, but you do you.
+   *
+   * @param context that holds onto the current state.
+   * @param currentState expected current state.
+   * @param newState new state to call.
+   * @param event that caused the transition.
+   */
+  default void handleTransitionEvent(Context context, State currentState, State newState, Event event) {
+    handleTransitionEvent(context, currentState, newState);
+  }
+
+  /**
    * Macro method that handles the full state change and callback execution.
    *
    * @param context that holds onto the current state.
