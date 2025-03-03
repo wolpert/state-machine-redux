@@ -1,5 +1,8 @@
 # State Machine Redux
 
+# NOTE: ARCHIVED AND THIS IS MOVED TO https://github.com/wolpert/libraries
+
+
 ## Purpose
 
 This project is a simplified state machine with add-ons
